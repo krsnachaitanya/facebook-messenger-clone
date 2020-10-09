@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import "./App.css";
-import { Button, FormControl, Input, InputLabel } from "@material-ui/core";
+import { FormControl, Input, IconButton } from "@material-ui/core";
 import Message from "./components/message/message.component";
 import firebase from "firebase";
 import db from "./firebase";
+import FlipMove from "react-flip-move";
+import SendIcon from "@material-ui/icons/SendRounded";
 
 function App() {
   const [input, setInput] = useState("");
@@ -12,9 +14,13 @@ function App() {
 
   useEffect(() => {
     // run once when the app component loads
-    db.collection("messages").onSnapshot((snapshot) => {
-      setMessages(snapshot.docs.map((doc) => doc.data()));
-    });
+    db.collection("messages")
+      .orderBy("timestamp", "desc")
+      .onSnapshot((snapshot) => {
+        setMessages(
+          snapshot.docs.map((doc) => ({ id: doc.id, message: doc.data() }))
+        );
+      });
   }, []);
 
   useEffect(() => {
@@ -36,29 +42,32 @@ function App() {
     <div className="App">
       <h1>Facebook Messenger Clone</h1>
       <h2>Welcome {username}</h2>
-      <form action="">
-        <FormControl>
-          <InputLabel htmlFor="send-message">Enter a message...</InputLabel>
+      <form className="app__form">
+        <FormControl className="app__formcontrol">
           <Input
+            className="app__input"
+            placeholder="Enter a message..."
             id="send-message"
             onChange={(event) => setInput(event.target.value)}
             value={input}
           />
-          <Button
+          <IconButton
+            className="app__iconbutton"
             variant="contained"
             color="primary"
             type="submit"
             onClick={sendMessage}
             disabled={!input}
           >
-            Send Message
-          </Button>
+            <SendIcon />
+          </IconButton>
         </FormControl>
       </form>
-
-      {messages.map((message) => (
-        <Message username={username} message={message} />
-      ))}
+      <FlipMove>
+        {messages.map(({ id, message }) => (
+          <Message key={id} username={username} message={message} />
+        ))}
+      </FlipMove>
     </div>
   );
 }
