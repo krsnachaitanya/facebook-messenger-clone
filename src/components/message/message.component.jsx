@@ -9,7 +9,7 @@ function Message({ message, username }) {
   return (
     <Card className={`${isUser ? "message__user" : ""} message__card`}>
       <CardContent>
-        <Typography variant="h5">{message.text}</Typography>
+        <Typography variant="h5">{message.message}</Typography>
         <Typography color="textSecondary">{message.username}</Typography>
       </CardContent>
     </Card>
